@@ -154,7 +154,7 @@ export const DOCS: DocSection[] = [
     title: "Safety",
     summary: "What the site can and can't do.",
     items: [
-      ["Read only", "The game only reads balances and history. The launchpad is the only thing that asks for a transaction, and your wallet shows exactly what each one does before you approve."],
+      ["Read only", "The game only reads balances and history. The launchpad is the only thing that asks for a transaction, and your wallet shows exactly what it does before you approve."],
       ["Sign in", "A free message signature to prove the wallet is yours. It can't move tokens."],
       ["Wallets", "Phantom, Solflare and Backpack. On a phone, connect opens Pump Tower inside the Phantom or Solflare app."],
       ["Treasury", "The buy & burn wallet is public. Every transaction it makes is listed on the activity page and checkable on Solscan."],
