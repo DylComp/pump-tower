@@ -8,7 +8,7 @@ import { SITE_URL } from "@/lib/site";
 import { ago, fmtSol } from "./CoinCard";
 import SiteNav from "./SiteNav";
 import { useMe } from "./useMe";
-import { fromB64, post, provider, questEvent, rejected } from "./wallet";
+import { questEvent } from "./wallet";
 
 export default function CoinPage({ mint }: { mint: string }) {
   const wallet = useMe();
@@ -16,8 +16,6 @@ export default function CoinPage({ mint }: { mint: string }) {
   const [missing, setMissing] = useState(false);
   const [fresh, setFresh] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [paying, setPaying] = useState(false);
-  const [note, setNote] = useState<string | null>(null);
 
   const load = useCallback(() => {
     fetch(`/api/token/${mint}`)
@@ -37,27 +35,6 @@ export default function CoinPage({ mint }: { mint: string }) {
     load();
     setFresh(new URL(window.location.href).searchParams.has("new"));
   }, [load]);
-
-  async function payOut() {
-    if (paying) return;
-    setNote(null);
-    const me = wallet.me ?? (await wallet.connect());
-    if (!me) return;
-    const p = provider();
-    if (!p?.signAndSendTransaction) return setNote("This wallet can't send transactions. Try Phantom, Solflare or Backpack.");
-    setPaying(true);
-    try {
-      const { tx } = await post<{ tx: string }>(`/api/token/${mint}/collect`);
-      const { VersionedTransaction } = await import("@solana/web3.js");
-      await p.signAndSendTransaction(VersionedTransaction.deserialize(fromB64(tx)));
-      setNote("Paid out. It shows up in a few seconds.");
-      setTimeout(load, 8000);
-    } catch (e) {
-      setNote(rejected(e) ? "Cancelled." : (e as Error).message);
-    } finally {
-      setPaying(false);
-    }
-  }
 
   if (missing)
     return (
@@ -174,15 +151,7 @@ export default function CoinPage({ mint }: { mint: string }) {
                       $PTWR buybacks <b>{fmtSol(c.feesSol - c.recipientSol)}</b>
                     </span>
                   </div>
-                  {(c.pendingSol ?? 0) > 0 && (
-                    <>
-                      <span className="dim">{fmtSol(c.pendingSol!)} SOL waiting to be paid out. Anyone can trigger it; you only pay the network fee.</span>
-                      <button className="btn small" onClick={payOut} disabled={paying}>
-                        {paying ? "paying out" : "pay out fees"}
-                      </button>
-                    </>
-                  )}
-                  {note && <span className="dim">{note}</span>}
+                  {(c.pendingSol ?? 0) > 0 && <span className="dim">{fmtSol(c.pendingSol!)} SOL waiting, paid out automatically.</span>}
                 </div>
                 <div className="panel tier-progress">
                   <span className="label">floor in {who}&apos;s tower</span>

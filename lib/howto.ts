@@ -117,7 +117,7 @@ export const DOCS: DocSection[] = [
       ["One approval", "Coin, fee split and optional dev buy happen in one transaction, so nobody can buy before you. Your wallet and a one-time mint key made in your browser are the only signers. No setup: launching is open to every wallet."],
       ["Kept", "Bonding curve, graduation to PumpSwap, dev buy, name, ticker, picture, description, X and Telegram links."],
       ["Off", "Custom websites (every coin's site is its page here), and mayhem mode, cashback and holder rewards mode, which would take the creator fees away from the split."],
-      ["Payouts", "Fees collect on pump.fun until someone pays them out. Anyone can press pay out on the coin's page; it costs only the network fee."],
+      ["Payouts", "Creator fees are paid out automatically: 80% to the pump user's wallet and 20% to the buy & burn wallet. Nobody has to press anything."],
       ["Tokens page", "Every coin launched here with its logo, fee tier, creator fees, market cap and 24h volume, plus totals across all coins: coins, pump profiles, creator fees, volume and market cap."],
       ["Fees routed", `A tracker on the activity page following every creator fee: ${SPLIT.recipientBps / 100}% to pump profiles, ${SPLIT.treasuryBps / 100}% to the treasury, then bought back and burned as $${HOUSE_SYMBOL}.`],
       ["Pump profiles", "A tab on the tokens page listing every pump user coins were launched for: how many coins, total fees, what they have earned, combined market cap and 24h volume, their latest launch and top coin."],
@@ -154,7 +154,7 @@ export const DOCS: DocSection[] = [
     title: "Safety",
     summary: "What the site can and can't do.",
     items: [
-      ["Read only", "The game only reads balances and history. The launchpad and fee payouts are the only things that ask for a transaction, and your wallet shows exactly what each one does before you approve."],
+      ["Read only", "The game only reads balances and history. The launchpad is the only thing that asks for a transaction, and your wallet shows exactly what each one does before you approve."],
       ["Sign in", "A free message signature to prove the wallet is yours. It can't move tokens."],
       ["Wallets", "Phantom, Solflare and Backpack. On a phone, connect opens Pump Tower inside the Phantom or Solflare app."],
       ["Treasury", "The buy & burn wallet is public. Every transaction it makes is listed on the activity page and checkable on Solscan."],
