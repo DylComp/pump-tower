@@ -7,6 +7,8 @@ import { verifyLaunch } from "@/lib/launch/pump";
 import { getCoin, saveCoin, type Coin, type Profile } from "@/lib/launch/registry";
 import { pendingKey } from "@/lib/launch/server";
 import { getJson } from "@/lib/redis";
+import { after } from "next/server";
+import { towerFor } from "@/lib/store";
 
 type Pending = { draft: Draft; recipient: Profile; launcher: string; treasury: string; signature: string | null };
 
@@ -36,6 +38,8 @@ export async function POST(req: Request) {
       createdAt: Date.now(),
     };
     await saveCoin(coin);
+    // Build the pump user's tower right away so it stands in the city and skyline before they ever visit.
+    after(() => towerFor(p.recipient.wallet, { fresh: true }).catch((e) => console.error("launch tower", e)));
     return json({ coin });
   } catch (e) {
     return fail(e, "launch confirm");

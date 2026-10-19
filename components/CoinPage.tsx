@@ -97,6 +97,10 @@ export default function CoinPage({ mint }: { mint: string }) {
             {fresh && (
               <div className="panel live-banner">
                 <span className="pixel green">your coin is live</span>
+                <span className="dim">{who}&apos;s tower is up in the city with this coin as a floor.</span>
+                <a className="btn small ghost" href={`/?w=${c.recipient.wallet}#tower`}>
+                  visit their tower
+                </a>
                 <a className="btn small" href={share} target="_blank" rel="noopener">
                   share on x
                 </a>

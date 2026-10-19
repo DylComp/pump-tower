@@ -129,6 +129,7 @@ export const DOCS: DocSection[] = [
     title: "Launch floors",
     summary: "Coins launched for you live in your tower.",
     items: [
+      ["Their tower", "Launching a coin for a pump user puts up their Pump Tower in the city and skyline right away, even if they've never visited. The launch page shows it before you launch, with the fee milestone for each floor upgrade."],
       ["Floor", "Every coin launched for a wallet becomes a floor in its tower, held or not. It ages from launch day like any bag."],
       ["Milestones", FEE_TIER_NAMES.map((n, i) => `${n} at ${FEE_TIERS[i]} SOL`).join(", ") + " of lifetime creator fees. Each one lifts the floor a room tier at once."],
       ["Cash", `Your share of fees paid out adds $${CASH_PER_SOL.toLocaleString("en-US")} of game cash per SOL, on top of the SOL itself.`],
