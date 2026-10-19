@@ -94,3 +94,44 @@ export const FEE_TIERS = [0, 0.1, 1, 5, 25, 100] as const;
 /** What each milestone turns the coin's floor in the recipient's tower into. */
 export const FEE_TIER_NAMES = ["ground floor", "neon sign", "sky lounge", "rooftop club", "gold spire", "the crown"] as const;
 export const feeTier = (sol: number) => FEE_TIERS.reduce<number>((t, min, i) => (sol >= min ? i : t), 0);
+
+type ProfileCoin = {
+  mint: string;
+  name: string;
+  ticker: string;
+  createdAt: number;
+  feesSol: number;
+  recipientSol: number;
+  mcapUsd?: number | null;
+  recipient: { wallet: string; username: string | null; image: string | null; x: string | null; followers: number | null };
+};
+
+export type ProfileStats<P = ProfileCoin["recipient"]> = {
+  profile: P;
+  coins: number;
+  feesSol: number;
+  recipientSol: number;
+  mcapUsd: number;
+  top: { mint: string; name: string; ticker: string; mcapUsd: number | null } | null;
+  latest: number;
+};
+
+/** Every pump user coins were launched for, with their totals, most fees first, then most market cap. */
+export function profileStats<C extends ProfileCoin>(coins: C[]): ProfileStats<C["recipient"]>[] {
+  const by = new Map<string, ProfileStats<C["recipient"]>>();
+  for (const c of coins) {
+    const p = by.get(c.recipient.wallet) ?? { profile: c.recipient, coins: 0, feesSol: 0, recipientSol: 0, mcapUsd: 0, top: null, latest: 0 };
+    p.coins++;
+    p.feesSol += c.feesSol;
+    p.recipientSol += c.recipientSol;
+    p.mcapUsd += c.mcapUsd ?? 0;
+    if (!p.top || (c.mcapUsd ?? -1) > (p.top.mcapUsd ?? -1)) p.top = { mint: c.mint, name: c.name, ticker: c.ticker, mcapUsd: c.mcapUsd ?? null };
+    // The newest coin carries the freshest copy of the profile.
+    if (c.createdAt > p.latest) {
+      p.latest = c.createdAt;
+      p.profile = c.recipient;
+    }
+    by.set(c.recipient.wallet, p);
+  }
+  return [...by.values()].sort((a, b) => b.feesSol - a.feesSol || b.mcapUsd - a.mcapUsd || b.latest - a.latest);
+}

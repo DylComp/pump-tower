@@ -19,7 +19,7 @@ export type Coin = {
   createdAt: number;
 };
 
-export type CoinView = Coin & { feesSol: number; recipientSol: number; tier: number; pendingSol?: number };
+export type CoinView = Coin & { feesSol: number; recipientSol: number; tier: number; pendingSol?: number; mcapUsd?: number | null };
 
 const k = {
   coin: (m: string) => `pt:coin:${m}`,

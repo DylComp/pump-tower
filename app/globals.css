@@ -1960,7 +1960,7 @@ button.chip.on {
 /* tokens grid */
 .token-stats {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
   gap: 12px;
   margin-bottom: 20px;
 }
@@ -1976,6 +1976,9 @@ button.chip.on {
 }
 .token-stats .tile:nth-child(4) {
   animation-delay: 0.24s;
+}
+.token-stats .tile:nth-child(5) {
+  animation-delay: 0.32s;
 }
 .token-tools {
   display: flex;
@@ -2038,6 +2041,54 @@ button.chip.on {
   text-overflow: ellipsis;
   white-space: nowrap;
   font-size: 11px;
+}
+.profile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 12px;
+}
+.profile-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  animation: stamp 0.45s steps(5) backwards;
+  animation-delay: calc(min(var(--i), 12) * 45ms);
+  transition: border-color 0.15s;
+}
+.profile-card:hover {
+  border-color: var(--green);
+}
+.profile-card .pump-who .pixel {
+  font-size: 11px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.profile-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 14px;
+  margin: 0;
+}
+.profile-stats div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.profile-stats dd {
+  margin: 0;
+}
+.profile-top:hover {
+  color: var(--ink);
+}
+.profile-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+}
+.profile-actions .btn {
+  flex: 1;
+  text-align: center;
 }
 .coin-meta {
   display: flex;

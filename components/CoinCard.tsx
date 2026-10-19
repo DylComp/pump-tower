@@ -4,6 +4,14 @@ import { shortAddr } from "@/lib/game";
 
 export const fmtSol = (n: number) => (n >= 100 ? n.toFixed(0) : n >= 1 ? n.toFixed(2) : n.toFixed(4));
 
+export function fmtMcap(n: number | null | undefined) {
+  if (n == null) return "–";
+  if (n >= 1e9) return `$${(n / 1e9).toFixed(2)}b`;
+  if (n >= 1e6) return `$${(n / 1e6).toFixed(2)}m`;
+  if (n >= 1e3) return `$${(n / 1e3).toFixed(1)}k`;
+  return `$${Math.round(n)}`;
+}
+
 export function ago(ms: number) {
   const s = Math.max(1, Math.floor((Date.now() - ms) / 1000));
   if (s < 60) return `${s}s ago`;
@@ -26,6 +34,7 @@ export default function CoinCard({ c, i = 0 }: { c: CoinView; i?: number }) {
         <span className="coin-meta">
           <span className={`chip tier-${c.tier}`}>{FEE_TIER_NAMES[c.tier]}</span>
           <span className="dim">{fmtSol(c.feesSol)} SOL fees</span>
+          <span className="dim">{fmtMcap(c.mcapUsd)} mc</span>
         </span>
       </span>
     </a>

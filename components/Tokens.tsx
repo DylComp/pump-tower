@@ -1,12 +1,13 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import type { CoinView } from "@/lib/launch/registry";
-import { FEE_TIERS, FEE_TIER_NAMES } from "@/lib/launch/model";
-import CoinCard, { fmtSol } from "./CoinCard";
+import type { CoinView, Profile } from "@/lib/launch/registry";
+import { FEE_TIERS, FEE_TIER_NAMES, type ProfileStats } from "@/lib/launch/model";
+import CoinCard, { fmtMcap, fmtSol } from "./CoinCard";
+import ProfileCard from "./ProfileCard";
 import SiteNav from "./SiteNav";
 import { useMe } from "./useMe";
 
-type Sort = "new" | "fees";
+type View = "coins" | "profiles";
 
 export default function Tokens() {
   const wallet = useMe();
@@ -15,7 +16,8 @@ export default function Tokens() {
   const [page, setPage] = useState(0);
   const [more, setMore] = useState(false);
   const [q, setQ] = useState("");
-  const [sort, setSort] = useState<Sort>("new");
+  const [view, setView] = useState<View>("coins");
+  const [profiles, setProfiles] = useState<ProfileStats<Profile>[] | null>(null);
 
   useEffect(() => {
     fetch(`/api/tokens?page=${page}`)
@@ -28,14 +30,27 @@ export default function Tokens() {
       .catch(() => setCoins((prev) => prev ?? []));
   }, [page]);
 
+  useEffect(() => {
+    if (view !== "profiles" || profiles) return;
+    fetch("/api/tokens?view=profiles")
+      .then((r) => r.json())
+      .then((j: { profiles?: ProfileStats<Profile>[] }) => setProfiles(j.profiles ?? []))
+      .catch(() => setProfiles([]));
+  }, [view, profiles]);
+
   const shown = useMemo(() => {
     const term = q.trim().toLowerCase().replace(/^\$/, "");
     const list = (coins ?? []).filter(
       (c) => !term || c.name.toLowerCase().includes(term) || c.ticker.toLowerCase().includes(term) || (c.recipient.username ?? "").toLowerCase().includes(term) || c.mint === q.trim(),
     );
-    return sort === "fees" ? [...list].sort((a, b) => b.feesSol - a.feesSol) : list;
-  }, [coins, q, sort]);
+    return list;
+  }, [coins, q]);
+  const shownProfiles = useMemo(() => {
+    const term = q.trim().toLowerCase().replace(/^@/, "");
+    return (profiles ?? []).filter((p) => !term || (p.profile.username ?? "").toLowerCase().includes(term) || p.profile.wallet === q.trim());
+  }, [profiles, q]);
   const fees = (coins ?? []).reduce((n, c) => n + c.feesSol, 0);
+  const mcap = (coins ?? []).reduce((n, c) => n + (c.mcapUsd ?? 0), 0);
 
   return (
     <>
@@ -57,6 +72,10 @@ export default function Tokens() {
               <span className="pixel big green">{fmtSol(fees)} SOL</span>
             </div>
             <div className="panel tile">
+              <span className="label">market cap</span>
+              <span className="pixel big">{fmtMcap(mcap)}</span>
+            </div>
+            <div className="panel tile">
               <span className="label">to pump users</span>
               <span className="pixel big">{fmtSol(fees * 0.8)} SOL</span>
             </div>
@@ -66,11 +85,16 @@ export default function Tokens() {
             </div>
           </div>
           <div className="token-tools">
-            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="search name, ticker or pump user" aria-label="search coins" />
+            <input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder={view === "coins" ? "search name, ticker or pump user" : "search pump users"}
+              aria-label={view === "coins" ? "search coins" : "search pump users"}
+            />
             <div className="tabs">
-              {(["new", "fees"] as Sort[]).map((s) => (
-                <button key={s} className={`tab${sort === s ? " on" : ""}`} onClick={() => setSort(s)}>
-                  {s === "new" ? "newest" : "most fees"}
+              {(["coins", "profiles"] as View[]).map((v) => (
+                <button key={v} className={`tab${view === v ? " on" : ""}`} onClick={() => setView(v)}>
+                  {v === "coins" ? "coins" : "pump profiles"}
                 </button>
               ))}
             </div>
@@ -78,10 +102,25 @@ export default function Tokens() {
               launch a coin
             </a>
           </div>
-          {coins == null ? (
+          {view === "profiles" ? (
+            profiles == null ? (
+              <p className="pixel blink tiny-pixel">loading pump profiles</p>
+            ) : shownProfiles.length ? (
+              <div className="profile-grid swap" key={q}>
+                {shownProfiles.map((p, i) => (
+                  <ProfileCard key={p.profile.wallet} p={p} i={i} />
+                ))}
+              </div>
+            ) : (
+              <div className="panel empty-coins">
+                <p className="pixel green">{profiles.length ? "nothing matches" : "no pump profiles yet"}</p>
+                <p className="dim">{profiles.length ? "Try another username." : "Launch a coin for a pump user and they show up here with their stats."}</p>
+              </div>
+            )
+          ) : coins == null ? (
             <p className="pixel blink tiny-pixel">loading coins</p>
           ) : shown.length ? (
-            <div className="coin-grid swap" key={sort + q}>
+            <div className="coin-grid swap" key={q}>
               {shown.map((c, i) => (
                 <CoinCard key={c.mint} c={c} i={i} />
               ))}
@@ -92,7 +131,7 @@ export default function Tokens() {
               <p className="dim">{coins.length ? "Try another name or ticker." : "Be the first: launch one for your favorite pump user."}</p>
             </div>
           )}
-          {more && !q && (
+          {view === "coins" && more && !q && (
             <button className="btn ghost more" onClick={() => setPage((p) => p + 1)}>
               load more
             </button>

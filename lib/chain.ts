@@ -190,6 +190,12 @@ async function metadata(mints: string[]): Promise<Map<string, Meta>> {
   return out;
 }
 
+/** Market cap in USD for each mint DexScreener knows, read from its most liquid pair. */
+export async function marketCaps(mints: string[]): Promise<Map<string, number | null>> {
+  const meta = await metadata(mints);
+  return new Map(mints.map((m) => [m, meta.get(m)?.mcap ?? null]));
+}
+
 async function pool<T, R>(items: T[], size: number, fn: (t: T) => Promise<R>): Promise<R[]> {
   const out: R[] = new Array(items.length);
   let next = 0;
