@@ -4,7 +4,6 @@ import "./live.css";
 import { Analytics } from "@vercel/analytics/next";
 import { SITE_URL } from "@/lib/site";
 import ErrorReporter from "@/components/ErrorReporter";
-import Ticker from "@/components/Ticker";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -31,7 +30,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <div className="fx-scan" aria-hidden />
         <div className="fx-vignette" aria-hidden />
-        <Ticker />
         {children}
         <ErrorReporter />
         <Analytics />
