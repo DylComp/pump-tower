@@ -17,13 +17,15 @@ function profiles(views: CoinView[]): ProfileSummary[] {
     const cap = v.mcapUsd ?? null;
     const p = by.get(v.recipient.wallet);
     if (!p) {
-      by.set(v.recipient.wallet, { profile: v.recipient, coins: 1, feesSol: v.feesSol, earnedSol: v.recipientSol, mcapUsd: cap ?? 0, top: { mint: v.mint, ticker: v.ticker, mcapUsd: cap }, latest: v.createdAt });
+      by.set(v.recipient.wallet, { profile: v.recipient, coins: 1, feesSol: v.feesSol, earnedSol: v.recipientSol, mcapUsd: cap ?? 0, top: { mint: v.mint, ticker: v.ticker, mcapUsd: cap }, recent: [{ mint: v.mint, ticker: v.ticker }], latest: v.createdAt });
       continue;
     }
     p.coins++;
     p.feesSol += v.feesSol;
     p.earnedSol += v.recipientSol;
     p.mcapUsd += cap ?? 0;
+    // Coins arrive newest first, so the strip keeps the latest five.
+    if (p.recent.length < 5) p.recent.push({ mint: v.mint, ticker: v.ticker });
     if ((cap ?? -1) > (p.top.mcapUsd ?? -1)) p.top = { mint: v.mint, ticker: v.ticker, mcapUsd: cap };
     if (v.createdAt > p.latest) {
       p.latest = v.createdAt;

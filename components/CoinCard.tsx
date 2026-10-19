@@ -1,6 +1,6 @@
 import type { CoinView } from "@/lib/launch/registry";
 import { FEE_TIER_NAMES } from "@/lib/launch/model";
-import { shortAddr } from "@/lib/game";
+import { CoinLogo, profileName } from "./Pics";
 
 export const fmtSol = (n: number) => (n <= 0 ? "0" : n >= 100 ? n.toFixed(0) : n >= 1 ? n.toFixed(2) : n.toFixed(4));
 
@@ -17,11 +17,10 @@ export function ago(ms: number) {
 
 /** One launched coin in a grid: picture, ticker, who it pays, and its fee tier. */
 export default function CoinCard({ c, i = 0 }: { c: CoinView; i?: number }) {
-  const who = c.recipient.username ? `@${c.recipient.username}` : shortAddr(c.recipient.wallet);
+  const who = profileName(c.recipient);
   return (
     <a className="panel coin-card" href={`/t/${c.mint}`} style={{ ["--i" as string]: i }}>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img className="coin-img" src={`/i/${c.mint}`} alt="" width={72} height={72} loading="lazy" />
+      <CoinLogo mint={c.mint} ticker={c.ticker} />
       <span className="coin-body">
         <span className="pixel">{c.name}</span>
         <span className="green pixel tiny-pixel">${c.ticker}</span>

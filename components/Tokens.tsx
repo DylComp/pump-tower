@@ -2,8 +2,9 @@
 import { useEffect, useMemo, useState } from "react";
 import type { CoinView, ProfileSummary } from "@/lib/launch/registry";
 import { FEE_TIERS, FEE_TIER_NAMES } from "@/lib/launch/model";
-import { shortAddr } from "@/lib/game";
 import CoinCard, { ago, fmtSol, fmtUsd } from "./CoinCard";
+import FeeTracker from "./FeeTracker";
+import { CoinLogo, ProfilePic, profileName } from "./Pics";
 import SiteNav from "./SiteNav";
 import { useMe } from "./useMe";
 
@@ -84,6 +85,7 @@ export default function Tokens() {
               <span className="dim">all coins combined</span>
             </div>
           </div>
+          <FeeTracker />
           <div className="token-tools">
             <input
               value={q}
@@ -158,16 +160,11 @@ export default function Tokens() {
 
 /** One pump user: picture, name, and their totals across every coin launched for them. */
 function ProfileCard({ p, i }: { p: ProfileSummary; i: number }) {
-  const name = p.profile.username ? `@${p.profile.username}` : shortAddr(p.profile.wallet);
+  const name = profileName(p.profile);
   return (
     <a className="panel profile-card" href={`/u/${p.profile.wallet}`} style={{ ["--i" as string]: i }}>
       <span className="profile-top">
-        {p.profile.image ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img className="pump-avatar" src={p.profile.image} alt="" width={48} height={48} loading="lazy" referrerPolicy="no-referrer" />
-        ) : (
-          <span className="pump-avatar">{name.replace("@", "").slice(0, 2)}</span>
-        )}
+        <ProfilePic profile={p.profile} size={48} />
         <span className="profile-name">
           <span className="pixel">{name}</span>
           <span className="dim">
@@ -193,8 +190,15 @@ function ProfileCard({ p, i }: { p: ProfileSummary; i: number }) {
           <span className="pixel">{fmtUsd(p.mcapUsd)}</span>
         </span>
       </span>
-      <span className="dim">
-        top coin <span className="green">${p.top.ticker}</span> {p.top.mcapUsd != null ? `at ${fmtUsd(p.top.mcapUsd)}` : ""}
+      <span className="profile-coins">
+        <span className="profile-logos" aria-hidden>
+          {(p.recent ?? [p.top]).map((c) => (
+            <CoinLogo key={c.mint} mint={c.mint} ticker={c.ticker} size={26} className="mini-logo" />
+          ))}
+        </span>
+        <span className="dim">
+          top <span className="green">${p.top.ticker}</span> {p.top.mcapUsd != null ? `at ${fmtUsd(p.top.mcapUsd)}` : ""}
+        </span>
       </span>
     </a>
   );

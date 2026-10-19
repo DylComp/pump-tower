@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { ProfilePic } from "./Pics";
 import type { CoinView, Profile } from "@/lib/launch/registry";
 import { rewardCash, shortAddr } from "@/lib/game";
 import CoinCard, { fmtSol } from "./CoinCard";
@@ -33,12 +34,7 @@ export default function UserPage({ wallet: addr }: { wallet: string }) {
       <main className="page user-page">
         <section className="sec">
           <div className="user-hero">
-            {profile?.image ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={profile.image} alt="" width={112} height={112} referrerPolicy="no-referrer" />
-            ) : (
-              <span className="pump-avatar huge">{name.replace("@", "").slice(0, 2)}</span>
-            )}
+            <ProfilePic profile={profile ?? { wallet: addr, username: null, image: null }} size={112} className="huge" />
             <div>
               <span className="kicker">pump profile</span>
               <h1 className="pixel display sm">{name}</h1>

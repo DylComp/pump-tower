@@ -1,5 +1,6 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
+import { CoinLogo, ProfilePic } from "./Pics";
 import type { CoinView } from "@/lib/launch/registry";
 import { FEE_TIERS, FEE_TIER_NAMES } from "@/lib/launch/model";
 import { shortAddr } from "@/lib/game";
@@ -103,8 +104,7 @@ export default function CoinPage({ mint }: { mint: string }) {
               </div>
             )}
             <div className="coin-hero">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={`/i/${mint}`} alt="" width={128} height={128} />
+              <CoinLogo mint={mint} ticker={c.ticker} size={128} className="hero-logo" />
               <div>
                 <span className="kicker">{ago(c.createdAt)}</span>
                 <h1 className="pixel display sm">{c.name}</h1>
@@ -152,12 +152,7 @@ export default function CoinPage({ mint }: { mint: string }) {
                 <a className="panel recipient" href={`/u/${c.recipient.wallet}`}>
                   <span className="label">launched for</span>
                   <span className="pump-profile big">
-                    {c.recipient.image ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={c.recipient.image} alt="" width={56} height={56} referrerPolicy="no-referrer" />
-                    ) : (
-                      <span className="pump-avatar">{who.replace("@", "").slice(0, 2)}</span>
-                    )}
+                    <ProfilePic profile={c.recipient} size={56} />
                     <span className="pump-who">
                       <span className="pixel">{who}</span>
                       <span className="dim">gets 80% of creator fees</span>

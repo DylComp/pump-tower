@@ -22,7 +22,17 @@ export type Coin = {
 export type CoinView = Coin & { feesSol: number; recipientSol: number; tier: number; pendingSol?: number; mcapUsd?: number | null };
 
 /** One pump user across every coin launched for them, for the profiles list. */
-export type ProfileSummary = { profile: Profile; coins: number; feesSol: number; earnedSol: number; mcapUsd: number; top: { mint: string; ticker: string; mcapUsd: number | null }; latest: number };
+export type ProfileSummary = {
+  profile: Profile;
+  coins: number;
+  feesSol: number;
+  earnedSol: number;
+  mcapUsd: number;
+  top: { mint: string; ticker: string; mcapUsd: number | null };
+  /** Their newest coins, for the logo strip on their card. */
+  recent: { mint: string; ticker: string }[];
+  latest: number;
+};
 
 const k = {
   coin: (m: string) => `pt:coin:${m}`,
