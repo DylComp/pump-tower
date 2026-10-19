@@ -7,6 +7,7 @@ import { SPLIT, MAX_IMAGE_BYTES, cleanDraft, emptyDraft, initialBuyLamports, typ
 import type { Profile } from "@/lib/launch/registry";
 import { shortAddr } from "@/lib/game";
 import { SITE_HOST } from "@/lib/site";
+import Logo from "./Logo";
 import SiteNav from "./SiteNav";
 import { useMe } from "./useMe";
 import { fromB64, post, provider, rejected, toB64 } from "./wallet";
@@ -84,6 +85,7 @@ export default function Launch() {
   const [draft, setDraft] = useState<Draft>(emptyDraft);
   const [image, setImage] = useState<string | null>(null);
   const [imageError, setImageError] = useState<string | null>(null);
+  const [dragging, setDragging] = useState(false);
   const [step, setStep] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -132,8 +134,7 @@ export default function Launch() {
     }
   }
 
-  async function pick(e: ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
+  async function pick(file: File | undefined) {
     if (!file) return;
     setImageError(null);
     try {
@@ -195,6 +196,8 @@ export default function Launch() {
   const closed = status && !status.open;
   const tickerShown = draft.ticker.trim().replace(/^\$/, "").toUpperCase() || "TICKER";
 
+  const who = recipient ? (recipient.username ? `@${recipient.username}` : shortAddr(recipient.wallet)) : null;
+
   return (
     <>
       <SiteNav wallet={wallet} active="/launch" />
@@ -204,17 +207,17 @@ export default function Launch() {
             <span className="kicker">launchpad</span>
             <h1 className="pixel display sm">launch a coin for any pump user</h1>
             <p className="lede">
-              Pick anyone on pump.fun. Their coin goes live on pump.fun, {SPLIT.recipientBps / 100}% of its creator fees go straight to their wallet forever, and{" "}
-              {SPLIT.treasuryBps / 100}% buys back $PTWR. The coin also moves into their tower as a floor that climbs with every fee milestone.
+              Pick anyone on pump.fun and launch a coin for them. They get {SPLIT.recipientBps / 100}% of its creator fees forever, {SPLIT.treasuryBps / 100}% buys back
+              $PTWR, and they get their own Pump Tower with the coin as a floor.
             </p>
           </div>
 
           <ol className="launch-how">
             {[
-              ["pick a pump user", "Search a username, paste their pump.fun link or a wallet. Their picture and wallet show before you launch."],
-              ["name the coin", "Name, ticker, picture, X and Telegram, plus an optional dev buy."],
-              ["approve once", `Coin, the locked ${SPLIT.recipientBps / 100}/${SPLIT.treasuryBps / 100} fee split and your dev buy go out in one transaction, so nobody buys before you.`],
-              ["fees flow forever", `${SPLIT.recipientBps / 100}% of creator fees to them, ${SPLIT.treasuryBps / 100}% to $PTWR buybacks. Their tower floor climbs with every milestone.`],
+              ["pick a pump user", "Search a username, paste a pump.fun link or a wallet."],
+              ["design the coin", "Logo, name, ticker, description, links and an optional dev buy."],
+              ["approve once", `Coin, locked ${SPLIT.recipientBps / 100}/${SPLIT.treasuryBps / 100} fee split and dev buy in one transaction.`],
+              ["their tower goes up", "They get a tower in the city. The coin is a floor that climbs with every fee milestone."],
             ].map(([title, body], i) => (
               <li key={title} className="panel" style={{ ["--i" as string]: i }}>
                 <span className="pixel green tiny-pixel">
@@ -230,7 +233,7 @@ export default function Launch() {
           <form className="launch-grid" onSubmit={launch}>
             <div className="launch-form">
               <fieldset className="panel step-box">
-                <legend className="pixel tiny-pixel green">01 who gets the fees</legend>
+                <legend className="pixel tiny-pixel green">01 who gets the fees and the tower</legend>
                 <div className="find-row">
                   <input
                     value={query}
@@ -249,7 +252,7 @@ export default function Launch() {
                     {finding ? "finding" : "find"}
                   </button>
                 </div>
-                {me && (
+                {me && !recipient && (
                   <button type="button" className="link" onClick={() => (setQuery(me), void find(me))}>
                     launch for my own wallet
                   </button>
@@ -258,33 +261,72 @@ export default function Launch() {
                 {recipient && (
                   <div className="found swap" key={recipient.wallet}>
                     <ProfileCard p={recipient} big />
-                    <span className="dim">Creator fees from this coin pay this wallet. It never has to sign anything.</span>
+                    <div className="tower-callout">
+                      <Logo size={34} />
+                      <span>
+                        <span className="pixel tiny-pixel green">{who}&apos;s tower goes up</span>
+                        <span className="dim">
+                          Launching gives them a Pump Tower in the city. This coin becomes a floor in it and climbs a room tier with every fee milestone. They never have
+                          to sign anything.
+                        </span>
+                      </span>
+                      <a className="link" href={`/?w=${recipient.wallet}#tower`} target="_blank" rel="noopener">
+                        peek
+                      </a>
+                    </div>
                   </div>
                 )}
               </fieldset>
 
               <fieldset className="panel step-box">
-                <legend className="pixel tiny-pixel green">02 the coin</legend>
-                <div className="two">
-                  <label>
-                    <span className="label">name</span>
-                    <input value={draft.name} onChange={set("name")} maxLength={32} placeholder="Tower Cat" required />
-                  </label>
-                  <label>
-                    <span className="label">ticker</span>
-                    <input value={draft.ticker} onChange={set("ticker")} maxLength={11} placeholder="TCAT" required />
-                  </label>
+                <legend className="pixel tiny-pixel green">02 design the coin</legend>
+                <div className="coin-design">
+                  <div className="logo-col">
+                    <label
+                      className={`logo-drop${image ? " has" : ""}${dragging ? " over" : ""}`}
+                      onDragOver={(e) => (e.preventDefault(), setDragging(true))}
+                      onDragLeave={() => setDragging(false)}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        setDragging(false);
+                        void pick(e.dataTransfer.files?.[0]);
+                      }}
+                    >
+                      <input className="sr-only" type="file" accept="image/png,image/jpeg,image/gif,image/webp" onChange={(e) => void pick(e.target.files?.[0])} />
+                      {image ? (
+                        <>
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={image} alt="coin logo" />
+                          <span className="logo-drop-change pixel tiny-pixel">change</span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="logo-drop-plus" aria-hidden />
+                          <span className="pixel tiny-pixel">coin logo</span>
+                          <span className="dim">drop or tap</span>
+                        </>
+                      )}
+                    </label>
+                    <span className="dim logo-hint">PNG, JPG, WebP or GIF. Squared to 512px.</span>
+                    {imageError && <p className="red">{imageError}</p>}
+                  </div>
+                  <div className="coin-fields">
+                    <div className="two">
+                      <label>
+                        <span className="label">name</span>
+                        <input value={draft.name} onChange={set("name")} maxLength={32} placeholder="Tower Cat" required />
+                      </label>
+                      <label>
+                        <span className="label">ticker</span>
+                        <input value={draft.ticker} onChange={set("ticker")} maxLength={11} placeholder="TCAT" required />
+                      </label>
+                    </div>
+                    <label>
+                      <span className="label">description</span>
+                      <textarea value={draft.description} onChange={set("description")} maxLength={1000} rows={4} placeholder="what is this coin about" />
+                    </label>
+                  </div>
                 </div>
-                <label>
-                  <span className="label">description</span>
-                  <textarea value={draft.description} onChange={set("description")} maxLength={1000} rows={3} placeholder="what is this coin about" />
-                </label>
-                <label className="image-pick">
-                  <span className="label">picture</span>
-                  <input type="file" accept="image/png,image/jpeg,image/gif,image/webp" onChange={pick} />
-                  <span className="dim">PNG, JPG, WebP or GIF. Squared and shrunk to 512px for you.</span>
-                </label>
-                {imageError && <p className="red">{imageError}</p>}
               </fieldset>
 
               <fieldset className="panel step-box">
@@ -300,15 +342,13 @@ export default function Launch() {
                   </label>
                 </div>
                 <label>
-                  <span className="label">website</span>
-                  <input value={`${SITE_HOST}/t/<this coin>`} disabled />
-                  <span className="dim">Locked: every coin&apos;s website is its own page here, so traders can always find its tower.</span>
-                </label>
-                <label>
                   <span className="label">dev buy in SOL (optional)</span>
                   <input value={draft.initialBuy} onChange={set("initialBuy")} placeholder="0" inputMode="decimal" />
-                  <span className="dim">Bought in the same transaction as the launch, so nobody can buy before you.</span>
+                  <span className="dim">Bought in the launch transaction itself, so nobody can buy before you.</span>
                 </label>
+                <p className="dim site-note">
+                  website: <span className="mono">{SITE_HOST}/t/&lt;this coin&gt;</span>, locked so traders can always find its tower.
+                </p>
               </fieldset>
             </div>
 
@@ -328,6 +368,10 @@ export default function Launch() {
                     <p className="dim clamp">{draft.description.trim() || "description"}</p>
                   </div>
                 </div>
+                <div className="preview-tower">
+                  <Logo size={20} />
+                  <span className="dim">{who ? `new floor in ${who}'s tower` : "becomes a floor in their tower"}</span>
+                </div>
               </div>
 
               <div className="panel split-box">
@@ -338,19 +382,19 @@ export default function Launch() {
                 </div>
                 <div className="split-legend">
                   <span>
-                    <i className="dot g" /> {recipient ? (recipient.username ? `@${recipient.username}` : shortAddr(recipient.wallet)) : "the pump user"}
+                    <i className="dot g" /> {who ?? "the pump user"}
                   </span>
                   <span>
-                    <i className="dot w" /> treasury, buys back $PTWR
+                    <i className="dot w" /> $PTWR buybacks
                   </span>
                 </div>
-                <span className="dim">The split is set and its admin removed in the launch itself. Nobody, us included, can change it later.</span>
+                <span className="dim">Set and its admin removed in the launch itself. Nobody, us included, can change it later.</span>
               </div>
 
-              <div className="panel">
+              <div className="panel cost-box">
                 <span className="label">you pay</span>
                 <p className="pixel">{buySol == null ? "check the dev buy" : `about ${(0.025 + buySol).toFixed(3)} SOL`}</p>
-                <span className="dim">Roughly 0.025 SOL of pump.fun and network costs{buySol ? `, plus your ${buySol} SOL dev buy` : ""}. Your wallet shows the exact amount.</span>
+                <span className="dim">About 0.025 SOL in pump.fun and network costs{buySol ? `, plus your ${buySol} SOL dev buy` : ""}. Your wallet shows the exact amount.</span>
               </div>
 
               <button className="btn launch-go" type="submit" disabled={step != null || !recipient || !!problem || !status?.open}>

@@ -1,5 +1,6 @@
 // Called once the launch lands: reads the coin back off chain and, only if the 80/20
-// split is locked in, lists it on Pump Tower.
+// split is locked in, lists it on Pump Tower and puts up the pump user's tower.
+import { after } from "next/server";
 import { body, fail, json } from "@/lib/api";
 import { limited } from "@/lib/limit";
 import { isAddress, type Draft } from "@/lib/launch/model";
@@ -7,6 +8,7 @@ import { verifyLaunch } from "@/lib/launch/pump";
 import { getCoin, saveCoin, type Coin, type Profile } from "@/lib/launch/registry";
 import { pendingKey } from "@/lib/launch/server";
 import { getJson } from "@/lib/redis";
+import { towerFor } from "@/lib/store";
 
 type Pending = { draft: Draft; recipient: Profile; launcher: string; treasury: string; signature: string | null };
 
@@ -36,6 +38,9 @@ export async function POST(req: Request) {
       createdAt: Date.now(),
     };
     await saveCoin(coin);
+    // Their tower goes up now: read and rank it so it stands in the city straight away,
+    // with this coin as a floor, instead of waiting for someone to open it.
+    after(() => towerFor(p.recipient.wallet, { fresh: true }).catch((e) => console.error("launch tower", e)));
     return json({ coin });
   } catch (e) {
     return fail(e, "launch confirm");

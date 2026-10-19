@@ -2519,3 +2519,166 @@ button.chip.on {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+/* ---------- launchpad form (components/Launch.tsx) ---------- */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.tower-callout {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(74, 222, 128, 0.1), rgba(253, 230, 138, 0.05));
+  border: 1px solid var(--line-strong);
+}
+.tower-callout > span {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.coin-design {
+  display: grid;
+  grid-template-columns: 168px minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+.logo-col,
+.coin-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+.logo-hint {
+  font-size: 16px;
+  line-height: 1.2;
+}
+.logo-drop {
+  position: relative;
+  width: 168px;
+  height: 168px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 14px;
+  cursor: pointer;
+  overflow: hidden;
+  background:
+    linear-gradient(var(--panel), var(--panel)) padding-box,
+    repeating-linear-gradient(90deg, var(--green) 0 8px, transparent 8px 14px) border-box;
+  border: 2px solid transparent;
+  box-shadow: inset 0 0 40px rgba(74, 222, 128, 0.06);
+  transition: box-shadow 0.2s, transform 0.15s var(--step);
+}
+.logo-drop:hover,
+.logo-drop.over {
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 0 40px rgba(74, 222, 128, 0.14),
+    0 0 30px -6px rgba(74, 222, 128, 0.55);
+}
+.logo-drop:focus-within {
+  outline: 2px solid var(--green);
+  outline-offset: 3px;
+}
+.logo-drop-plus {
+  position: relative;
+  width: 30px;
+  height: 30px;
+}
+.logo-drop-plus::before,
+.logo-drop-plus::after {
+  content: "";
+  position: absolute;
+  background: var(--green);
+  box-shadow: 0 0 10px rgba(74, 222, 128, 0.7);
+}
+.logo-drop-plus::before {
+  left: 12px;
+  top: 0;
+  width: 6px;
+  height: 30px;
+}
+.logo-drop-plus::after {
+  top: 12px;
+  left: 0;
+  width: 30px;
+  height: 6px;
+}
+.logo-drop .dim {
+  font-size: 16px;
+}
+.logo-drop.has {
+  background: var(--panel);
+  border: 2px solid var(--line-strong);
+}
+.logo-drop img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.logo-drop-change {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: 8px;
+  padding: 6px 0;
+  text-align: center;
+  border-radius: 6px;
+  background: rgba(8, 9, 11, 0.78);
+  color: var(--green);
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.15s, transform 0.15s;
+}
+.logo-drop.has:hover .logo-drop-change,
+.logo-drop.has:focus-within .logo-drop-change {
+  opacity: 1;
+  transform: none;
+}
+.site-note {
+  margin: 0;
+  font-size: 17px;
+}
+.preview-tower {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--line);
+}
+@media (max-width: 640px) {
+  .coin-design {
+    grid-template-columns: 1fr;
+  }
+  .logo-col {
+    align-items: center;
+    text-align: center;
+  }
+  .tower-callout {
+    grid-template-columns: auto 1fr;
+  }
+  .tower-callout .link {
+    grid-column: 2;
+    justify-self: start;
+  }
+}
+.live-banner {
+  flex-wrap: wrap;
+}
+.live-banner .dim {
+  flex: 1 1 220px;
+}
