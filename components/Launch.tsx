@@ -239,8 +239,6 @@ export default function Launch() {
             </ol>
           </header>
 
-          {closed && <div className="panel launch-closed pixel">{status.reason}</div>}
-
           <form className="launch-grid" onSubmit={launch}>
             <div className="launch-form">
               <section className="panel lp-box">
@@ -413,7 +411,7 @@ export default function Launch() {
                 </div>
 
                 <button className="btn launch-go" type="submit" disabled={step != null || !recipient || !!problem || !status?.open}>
-                  {step != null ? STEPS[step] : !recipient ? "pick who gets the fees" : problem ? problem : me ? "launch on pump.fun" : "connect and launch"}
+                  {step != null ? STEPS[step] : !recipient ? "pick who gets the fees" : problem ? problem : closed ? "launches open soon" : me ? "launch on pump.fun" : "connect and launch"}
                 </button>
                 {step != null && (
                   <ol className="launch-steps">

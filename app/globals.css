@@ -2073,13 +2073,6 @@ button.chip.on {
 .launch-steps li.now::before {
   content: "[>] ";
 }
-.launch-closed {
-  margin-bottom: 18px;
-  font-size: 10px;
-  line-height: 1.8;
-  color: #fde68a;
-  border-color: rgba(253, 230, 138, 0.35);
-}
 .kept summary {
   cursor: pointer;
   color: var(--ink-dim);
