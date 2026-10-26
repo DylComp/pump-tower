@@ -1,20 +1,6 @@
 {
   "crons": [
-    {
-      "path": "/api/cron/buybacks",
-      "schedule": "*/5 * * * *"
-    },
-    {
-      "path": "/api/cron/dev-fees",
-      "schedule": "2-59/5 * * * *"
-    },
-    {
-      "path": "/api/cron/profile-fees",
-      "schedule": "* * * * *"
-    },
-    {
-      "path": "/api/cron/king",
-      "schedule": "1-59/5 * * * *"
-    }
+    { "path": "/api/cron/king", "schedule": "1-59/5 * * * *" },
+    { "path": "/api/cron/king-worker", "schedule": "*/10 * * * *" }
   ]
 }

@@ -216,3 +216,12 @@ export type Reign = {
   status: "pending" | "paid";
   paidSignatures?: string[];
 };
+
+/** A coin created during this hour had zero lifetime fees at the hour's start. */
+export function seedNewCoinFees(start: Record<string, string>, coins: { mint: string; createdAt: number }[], hour: number) {
+  const next = { ...start };
+  for (const c of coins) {
+    if (c.createdAt >= hour && c.createdAt < hour + HOUR) next[c.mint] = "0";
+  }
+  return next;
+}

@@ -6,9 +6,9 @@
 //  - at a secret minute inside the hour, counts the holders of every squad coin;
 //  - once every wallet has been scanned past the hour's end, crowns the squad that banked the
 //    most SOL and writes the payout list. The treasury workers send the SOL; nothing here signs.
-import { getJson, setJson } from "../redis";
+import { getJson, setJson, redis } from "../redis";
 import { lifetimeLamports, holderBalances } from "./chain";
-import { COMPETITION_ENDS, HOLDERS_BPS, HOUR, hourId, hourOf, pickKing, potLamports, snapshotMinute, splitPot, type Reign } from "./model";
+import { COMPETITION_ENDS, HOLDERS_BPS, HOUR, hourId, hourOf, pickKing, potLamports, snapshotMinute, splitPot, seedNewCoinFees, type Reign } from "./model";
 import { allScannedSince, scanWallets } from "./scan";
 import { struckSquads, walletsOf } from "./source";
 import { allSquadCoins, bankedAt, carried, feesAt, hasHolders, holdersAt, reign, saveFees, saveHolders, saveReign, setCarried } from "./store";
@@ -22,8 +22,9 @@ const SCAN_BUDGET = 35_000;
 const secret = () => process.env.KING_SECRET || process.env.CRON_SECRET || "";
 
 export async function runKing(now = Date.now()) {
-  const hour = hourOf(now);
-  if (hour > COMPETITION_ENDS + HOUR) return { done: "competition over" };
+  // Never crown post-cup hours. A delayed final crown may catch up after the deadline.
+  if (now >= COMPETITION_ENDS && await reign(hourId(COMPETITION_ENDS - HOUR))) return { done: "competition over" };
+  const hour = Math.min(hourOf(now), COMPETITION_ENDS);
   const coins = await allSquadCoins();
   const wallets = walletsOf(new Set(coins.map((c) => c.groupId)));
   const log: string[] = [];
@@ -35,6 +36,16 @@ export async function runKing(now = Date.now()) {
     for (const c of coins) fees[c.mint] = read[c.mint] ?? (await previousFee(hour, c.mint));
     await saveFees(hour, fees);
     log.push(`fees ${hourId(hour)}`);
+  }
+
+  // Coins launched after the boundary must not lose their entire first hour of fees.
+  const baseline = await feesAt(hour);
+  if (baseline) {
+    const seeded = seedNewCoinFees(baseline, coins, hour);
+    if (JSON.stringify(seeded) !== JSON.stringify(baseline)) {
+      await saveFees(hour, seeded);
+      await redis("DEL", NOW);
+    }
   }
 
   // Holder count at the hour's secret minute.

@@ -99,3 +99,11 @@ test("snapshot minute is fixed per hour and inside :05 to :55", async () => {
     assert.ok(x >= 5 && x <= 55);
   }
 });
+
+import { seedNewCoinFees, HOUR } from './king/model.ts';
+test('new squad coins start at zero fees within their creation hour without resetting old baselines',()=>{
+ const hour=Date.parse('2026-10-26T22:00:00Z');
+ const seeded=seedNewCoinFees({old:'100',new:'12345'},[{mint:'old',createdAt:hour-1000},{mint:'new',createdAt:hour+1000},{mint:'unknownOld',createdAt:hour-1000},{mint:'future',createdAt:hour+HOUR}],hour);
+ assert.deepEqual(seeded,{old:'100',new:'0'});
+ assert.equal(potLamports(seeded,{old:'100',new:'2000000'}),1000000n);
+});

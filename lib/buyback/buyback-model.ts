@@ -6,7 +6,7 @@ import bs58 from "bs58";
 import canonicalize from "canonicalize";
 import { rawLamports } from "./amount.ts";
 export type BuybackPolicy = {
-  purpose?: "engineering";
+  purpose?: "engineering" | "king-hour";
   acceptanceRoute?: "pump-amm";
   treasury: string;
   mint: string;
@@ -61,11 +61,11 @@ export function validateBuybackPolicy(p: BuybackPolicy) {
       throw Error("Invalid buyback address");
   }
   if (
-    (p.purpose !== undefined && p.purpose !== "engineering") ||
+    (p.purpose !== undefined && p.purpose !== "engineering" && p.purpose !== "king-hour") ||
     (p.acceptanceRoute !== undefined && (p.purpose !== "engineering" || p.acceptanceRoute !== "pump-amm")) ||
     (p.revenueReserve !== undefined && (p.purpose !== undefined || rawLamports(p.revenueReserve) < 10000000n)) ||
     p.treasury === p.mint ||
-    rawLamports(p.maxInput) < 1000000n ||
+    rawLamports(p.maxInput) < (p.purpose === "king-hour" ? 1n : 1000000n) ||
     rawLamports(p.maxInput) > 10000000000n ||
     rawLamports(p.maxOverhead) < 5000n ||
     rawLamports(p.maxOverhead) > 10000000n ||

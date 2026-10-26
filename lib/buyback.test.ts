@@ -68,10 +68,10 @@ test("holder-reward buys require the official rewards PDA; standard creators rem
 });
 
 import { TREASURY_WALLET, DEV_WALLET } from "./game.ts";
-test("configured vanity wallets are valid, separate, and start with ptwr", () => {
+test("configured vanity wallets are valid, separate, and start with king", () => {
   assert.notEqual(TREASURY_WALLET, DEV_WALLET);
   for (const address of [TREASURY_WALLET, DEV_WALLET]) {
-    assert.ok(address && /^ptwr/i.test(address));
+    assert.ok(address && /^king/i.test(address));
     assert.equal(new PublicKey(address).toBase58(), address);
     assert.ok(PublicKey.isOnCurve(new PublicKey(address).toBytes()));
   }

@@ -167,7 +167,7 @@ export async function prepareLaunch(o: { draft: Draft; launcher: string; mint: s
     const need = 0.05e9 + Number(lamports);
     if ((await conn.getBalance(user, "confirmed")) < need) throw Error("Not enough SOL in this wallet for the launch and dev buy.");
   } else {
-    const sim = await conn.simulateTransaction(tx, { sigVerify: false, commitment: "confirmed" });
+    const sim = await conn.simulateTransaction(tx, { sigVerify: false, commitment: "confirmed", replaceRecentBlockhash: true });
     if (sim.value.err) {
       const logs = sim.value.logs ?? [];
       const broke = logs.some((l) => /insufficient lamports|InsufficientFunds/i.test(l));
@@ -223,15 +223,16 @@ export async function collectTx(mint: string, payer: string, priorityMicroLampor
   const conn = connection();
   const online = new OnlinePumpSdk(conn);
   const { instructions } = await online.buildDistributeCreatorFeesInstructions(m, { payer: p });
-  const latest = await conn.getLatestBlockhash("confirmed");
+  const latest = await conn.getLatestBlockhash("finalized");
   const message = new TransactionMessage({
     payerKey: p,
     recentBlockhash: latest.blockhash,
     instructions: [ComputeBudgetProgram.setComputeUnitLimit({ units: 400_000 }), ComputeBudgetProgram.setComputeUnitPrice({ microLamports: priorityMicroLamports ?? await priorityFee(conn) }), ...instructions],
   }).compileToV0Message();
   const tx = new VersionedTransaction(message);
-  const sim = await conn.simulateTransaction(tx, { sigVerify: false, commitment: "confirmed" });
+  const sim = await conn.simulateTransaction(tx, { sigVerify: false, commitment: "confirmed", replaceRecentBlockhash: true });
   if (sim.value.err) {
+    if (sim.value.err === "BlockhashNotFound") throw Error("Creator fee RPC blockhash unavailable");
     console.error("collect simulation", JSON.stringify(sim.value.err), sim.value.logs?.slice(-6));
     throw Error("Not enough fees to pay out yet, try again later.");
   }

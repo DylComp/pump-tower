@@ -7,6 +7,7 @@ import { feeHistory } from "./fee-history.ts";
 // vault, which levels up its floor and pays the recipient game cash.
 import { getJson, hasDb, pipeline, redis, setJson } from "../redis";
 import { feeTier } from "./model";
+import { squadCoinByMint } from "../king/store";
 
 export type Profile = { wallet: string; username: string | null; image: string | null; x: string | null; followers: number | null };
 
@@ -79,7 +80,7 @@ export async function paidOut(mint: string, vault: string, force = false, requir
   if (!force && prev && Date.now() - prev.at < 10 * 60_000) return prev.sol;
   try {
     const conn = new Connection(rpcUrl(), "finalized");
-    const launch = await getCoin(mint);
+    const launch = await getCoin(mint) ?? await squadCoinByMint(mint);
     const parser = new EventParser(sdk.PUMP_PROGRAM_ID, sdk.getPumpProgram(conn).coder);
     const history = await feeHistory(prev?.last ?? null, {
       requiredSignature,

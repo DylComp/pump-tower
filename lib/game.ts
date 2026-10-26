@@ -10,9 +10,9 @@ export const isHouseMint = (mint: string) => HOUSE_MINT != null && mint === HOUS
  * The Pump Tower treasury: 20% of every launchpad coin's creator fees go here for $PTWR
  * buybacks. Launching also requires the dev wallet to create its address lookup table.
  */
-export const TREASURY_WALLET: string | null = "pTWrBR7VzpAzztwYaLnot5sxP4a9tBJjyi1CLF4Xz1Z";
+export const TREASURY_WALLET: string | null = "kiNGXkmkJSMPQoFEdUZs68nANK16C1AjyQD2jVPY46C";
 /** dlao's vanity dev wallet. Only it can set up the launchpad's address lookup table. */
-export const DEV_WALLET: string | null = "pTwRp9D2oRe1iSjCpKgoyu1Pe7LYD5zYNZHU3Hid4e1";
+export const DEV_WALLET: string | null = "KiNgDiSzoX9Z69LoRZh73QkBhJNLqxDbJKgQ2bHmon7";
 export const CASH_PER_SOL = 10_000;
 /** Launch fee payouts land in the game too: every SOL a pump user is paid is worth this much cash. */
 export const rewardCash = (sol: number) => Math.floor(Math.max(0, sol) * CASH_PER_SOL);
