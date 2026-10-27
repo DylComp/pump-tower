@@ -663,3 +663,270 @@
 .pixelated {
   image-rendering: pixelated;
 }
+
+/* ---------- king of the hill intro (components/KingBoot.tsx) ---------- */
+html[data-kq-booted] .kqb {
+  display: none;
+}
+.kqb {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+.kqb-grid {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+}
+.kqb-grid i {
+  margin: -1px;
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 58%, rgba(74, 222, 128, 0.09), transparent 70%) fixed,
+    var(--bg);
+}
+.kqb.out .kqb-grid i {
+  animation: cellOut 0.24s steps(3) forwards;
+}
+.kqb-sky {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 6vw;
+  pointer-events: none;
+  mask-image: linear-gradient(transparent, #000 25%, #000 60%, transparent);
+  -webkit-mask-image: linear-gradient(transparent, #000 25%, #000 60%, transparent);
+  animation: kqbFade 0.6s ease 0.1s backwards;
+}
+.kqb-col {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+  font-size: 8px;
+  color: var(--green);
+  opacity: 0.16;
+  animation: kqbRise 18s linear infinite;
+}
+.kqb-col.c1 {
+  margin-top: 14vh;
+  text-align: right;
+  animation-duration: 23s;
+  animation-delay: -6s;
+}
+.kqb-col span {
+  white-space: nowrap;
+}
+.kqb-col span:nth-child(5n + 2) {
+  color: #fde68a;
+}
+.kqb.out .kqb-sky,
+.kqb.out .kqb-core {
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.kqb-core {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+.kqb-stage {
+  position: relative;
+  width: 256px;
+  height: 196px;
+  display: flex;
+  justify-content: center;
+}
+.kqb-rays {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: 340px;
+  height: 340px;
+  margin: -170px 0 0 -170px;
+  border-radius: 50%;
+  background: repeating-conic-gradient(rgba(253, 230, 138, 0.1) 0 8deg, transparent 8deg 22deg);
+  mask-image: radial-gradient(circle, #000 18%, transparent 66%);
+  -webkit-mask-image: radial-gradient(circle, #000 18%, transparent 66%);
+  animation: kqbSpin 14s steps(56) infinite;
+  opacity: 0.6;
+  transition: opacity 0.3s;
+}
+.kqb.crown .kqb-rays {
+  opacity: 1;
+  animation-duration: 3s;
+}
+.kqb-climb {
+  position: absolute;
+  bottom: 44px;
+  transition: transform 0.18s steps(2);
+  z-index: 1;
+}
+.kqb-climb img {
+  display: block;
+  animation: bob 0.9s steps(2) infinite;
+  filter: drop-shadow(0 0 18px rgba(74, 222, 128, 0.35));
+}
+.kqb.crown .kqb-climb img {
+  animation: kqbHail 0.5s steps(4) both;
+  filter: drop-shadow(0 0 26px rgba(253, 230, 138, 0.65));
+}
+.kqb-hill {
+  position: absolute;
+  bottom: 0;
+  width: 256px;
+  height: 80px;
+  z-index: 2;
+  animation: kqbUp 0.5s steps(5) backwards;
+}
+.kqb-spark {
+  position: absolute;
+  left: 50%;
+  top: 30%;
+  width: 6px;
+  height: 6px;
+  background: #fde68a;
+  box-shadow: 0 0 8px rgba(253, 230, 138, 0.9);
+  opacity: 0;
+  z-index: 3;
+}
+.kqb.crown .kqb-spark {
+  animation: kqbSpark 0.6s steps(6) forwards;
+}
+.kqb-title {
+  display: flex;
+  font-size: 15px;
+  color: var(--green);
+  text-shadow: 0 0 16px rgba(74, 222, 128, 0.55);
+}
+.kqb-title span {
+  animation: kqbType 0.01s steps(1) backwards;
+}
+.kqb.crown .kqb-title {
+  color: #fde68a;
+  text-shadow: 0 0 18px rgba(253, 230, 138, 0.6);
+}
+.kqb-bar {
+  position: relative;
+  width: 248px;
+  height: 12px;
+  border: 1px solid var(--line-strong);
+  padding: 2px;
+}
+.kqb-bar span {
+  display: block;
+  height: 100%;
+  background: repeating-linear-gradient(90deg, var(--green) 0 6px, transparent 6px 8px);
+}
+.kqb-crown {
+  position: absolute;
+  right: -24px;
+  top: -2px;
+  width: 14px;
+  height: 10px;
+  color: var(--ink-faint);
+  transition: color 0.2s;
+}
+.kqb.crown .kqb-bar span {
+  background: repeating-linear-gradient(90deg, #fde68a 0 6px, transparent 6px 8px);
+}
+.kqb.crown .kqb-crown {
+  color: #fde68a;
+  filter: drop-shadow(0 0 6px rgba(253, 230, 138, 0.8));
+}
+.kqb-meta {
+  width: 248px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+.kqb-line {
+  color: var(--ink-dim);
+  white-space: nowrap;
+}
+.kqb-pct {
+  font-family: var(--pixel);
+  font-size: 9px;
+  color: var(--green);
+  opacity: 0.75;
+  white-space: pre;
+  font-variant-numeric: tabular-nums;
+}
+@keyframes kqbRise {
+  to {
+    transform: translateY(-50%);
+  }
+}
+@keyframes kqbSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes kqbFade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes kqbUp {
+  from {
+    transform: translateY(40px);
+    opacity: 0;
+  }
+}
+@keyframes kqbType {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes kqbHail {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  40% {
+    transform: translateY(-14px) scale(1.06);
+  }
+  100% {
+    transform: translateY(-6px) scale(1.04);
+  }
+}
+@keyframes kqbSpark {
+  0% {
+    opacity: 1;
+    transform: rotate(var(--a)) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--a)) translateY(-96px);
+  }
+}
+@media (max-width: 560px) {
+  .kqb-stage {
+    transform: scale(0.85);
+  }
+  .kqb-sky {
+    padding: 0 12px;
+  }
+  .kqb-col {
+    opacity: 0.08;
+  }
+  .kqb-core {
+    background: radial-gradient(closest-side, var(--bg) 55%, transparent);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .kqb *,
+  .kqb.out .kqb-grid i {
+    animation: none !important;
+    transition: none !important;
+  }
+  .kqb.out {
+    opacity: 0;
+  }
+}
