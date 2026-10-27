@@ -7,6 +7,7 @@ import { shortAddr } from "@/lib/game";
 import { CopyText } from "./CopyCA";
 import { fmtSol, fmtUsd } from "./CoinCard";
 import { Crown, KING_BRAND, SquadPic, pumpCoin, sol, solSigned, useKing, type BoardSquad } from "./King";
+import KingBoot from "./KingBoot";
 import SiteNav from "./SiteNav";
 import { useMe } from "./useMe";
 
@@ -22,6 +23,7 @@ export default function KingSquad({ name }: { name: string }) {
 
   return (
     <>
+      <KingBoot ready={!!data || !!error} />
       <SiteNav wallet={wallet} active="/king" brand={KING_BRAND} />
       <main className="page king-page">
         <section className="sec king">

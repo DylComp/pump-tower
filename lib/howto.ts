@@ -142,6 +142,7 @@ export const DOCS: DocSection[] = [
       ["Left out", "Program accounts (the bonding curve, the PumpSwap pool), the treasury and the launch wallet never get holder payouts."],
       ["Public list", "Each hour's King, pot and every payout is published at /api/king/payouts, and the treasury workers send exactly that list."],
       ["Data", "Squads and their members come from pump.fun's board, read once when the cup locked membership. A squad's wallets are watched from the moment its coin launches, every five minutes. Our crown is our own on-chain count, not pump.fun's ranking. The cup runs until Nov 9, 14:00 UTC."],
+      ["Intro", "The first King page you open each browser session plays a short intro while the board loads: the crowned pill climbs the hill as real squad names drift past, then the screen breaks away in pixel blocks. After that, King pages open instantly."],
     ],
   },
   {

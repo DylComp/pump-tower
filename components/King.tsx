@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { Reign, Squad } from "@/lib/king/model";
 import { HOLDERS_BPS, POT_BPS, squadSlug } from "@/lib/king/model";
 import { ago, fmtSol, fmtUsd } from "./CoinCard";
+import KingBoot from "./KingBoot";
 import SiteNav, { type Brand } from "./SiteNav";
 import { useMe } from "./useMe";
 
@@ -100,6 +101,7 @@ export default function King() {
 
   return (
     <>
+      <KingBoot ready={!!data || !!error} names={data?.squads.map((s) => s.name)} />
       <SiteNav wallet={wallet} active="/king" brand={KING_BRAND} />
       <main className="page king-page">
         <section className="sec king">
